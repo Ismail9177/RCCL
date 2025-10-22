@@ -1,0 +1,76 @@
+Example Azure Resource Graph Query for VNets and Subnets
+
+Resources
+| where type == "microsoft.network/virtualnetworks"
+| project
+    subscriptionId,
+    resourceGroup,
+    name,
+    location,
+    properties.addressSpace.addressPrefixes,
+    subnets = properties.subnets
+This gives you VNets with their address spaces and subnets info.
+
+To get NSGs associated with VNets or Subnets
+NSGs are attached either to subnets or NICs, but to start, here’s NSGs:
+
+Resources
+| where type == "microsoft.network/networksecuritygroups"
+| project
+    subscriptionId,
+    resourceGroup,
+    name,
+    location,
+    securityRules = properties.securityRules
+
+User-Defined Routes (UDRs):
+UDRs are Route Tables in Azure:
+
+Resources
+| where type == "microsoft.network/routetables"
+| project
+    subscriptionId,
+    resourceGroup,
+    name,
+    location,
+    routes = properties.routes
+
+Public IP Addresses:
+
+Resources
+| where type == "microsoft.network/publicipaddresses"
+| project
+    subscriptionId,
+    resourceGroup,
+    name,
+    location,
+    ipAddress = properties.ipAddress
+
+
+
+Queries:
+
+1. Query NSG Flow Logs
+NSG flow logs record allowed/denied traffic through Network Security Groups. You can query these logs to analyze network traffic.
+Example: Count the number of allowed and denied flows by source IP
+
+
+AzureNetworkAnalytics_CL
+| where Category == "NetworkSecurityGroupFlowEvent"
+| summarize AllowedCount = countif(flowStatus == "Allowed"),
+            DeniedCount = countif(flowStatus == "Denied") 
+            by srcIp_s
+| order by AllowedCount desc
+
+2. Query Azure Activity Logs for VNet Events
+Track changes, creations, or deletions of VNets.
+Example: Find VNet-related operations in last 7 days
+
+
+AzureActivity
+| where ResourceProvider == "Microsoft.Network" 
+      and ResourceType == "virtualNetworks"
+      and TimeGenerated >= ago(7d)
+| project TimeGenerated, OperationName, Caller, ResourceGroup, Resource
+| order by TimeGenerated desc
+
