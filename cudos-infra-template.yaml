@@ -1,0 +1,157 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  AWS CUDOS Infrastructure Stack
+  - Sets up S3, Glue, Lambda, Athena resources for AWS Cost and Usage Reports
+
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: Name for S3 bucket storing Cost and Usage Reports
+  CURReportPrefix:
+    Type: String
+    Default: cost-usage-report
+    Description: Prefix for Cost and Usage Reports
+
+Resources:
+
+  CostUsageS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+      VersioningConfiguration:
+        Status: Enabled
+
+  GlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: cudos_db
+        Description: Glue database for Cost and Usage data
+
+  GlueCrawlerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: GlueCrawlerAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::${S3BucketName}
+                  - !Sub arn:aws:s3:::${S3BucketName}/*
+              - Effect: Allow
+                Action:
+                  - glue:CreateTable
+                  - glue:UpdateTable
+                  - glue:GetDatabase
+                  - glue:GetTable
+                Resource: "*"
+
+  GlueCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: cudos-cur-crawler
+      Role: !GetAtt GlueCrawlerRole.Arn
+      DatabaseName: !Ref GlueDatabase
+      Targets:
+        S3Targets:
+          - Path: !Sub s3://${S3BucketName}/${CURReportPrefix}/
+      Schedule:
+        ScheduleExpression: "cron(0 2 * * ? *)"  # runs daily
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DEPRECATE_IN_DATABASE
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaS3AthenaGlueAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource:
+                  - !Sub arn:aws:s3:::${S3BucketName}/*
+              - Effect: Allow
+                Action:
+                  - glue:GetTable
+                  - glue:GetDatabase
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - athena:StartQueryExecution
+                  - athena:GetQueryResults
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+
+  ProcessCURFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: process-cur-lambda
+      Runtime: python3.11
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 300
+      Code:
+        ZipFile: |
+          import json
+          def handler(event, context):
+              print("Processing CUR data event:", event)
+              return {"status": "OK"}
+
+  AthenaWorkGroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Name: cudos-athena-wg
+      Description: Athena workgroup for CUDOS CUR analysis
+      State: ENABLED
+      WorkGroupConfiguration:
+        PublishCloudWatchMetricsEnabled: true
+        ResultConfiguration:
+          OutputLocation: !Sub s3://${S3BucketName}/athena-results/
+
+Outputs:
+  S3Bucket:
+    Description: S3 bucket for CUR
+    Value: !Ref CostUsageS3Bucket
+
+  GlueCrawlerName:
+    Description: Glue Crawler name
+    Value: !Ref GlueCrawler
+
+  LambdaFunctionName:
+    Description: Lambda function name
+    Value: !Ref ProcessCURFunction
+
+  AthenaWorkGroup:
+    Description: Athena Workgroup for queries
+    Value: !Ref AthenaWorkGroup
