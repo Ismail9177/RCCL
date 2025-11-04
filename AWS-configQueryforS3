@@ -1,0 +1,30 @@
+SELECT
+  resourceId,
+  resourceName,
+  resourceType,
+  awsRegion,
+  configuration.name,
+  configuration.creationDate,
+  configuration.owner,
+  configuration.bucketPolicy,
+  configuration.bucketAcl,
+  configuration.publicAccessBlockConfiguration,
+  configuration.bucketLoggingConfiguration,
+  configuration.bucketVersioningConfiguration,
+  configuration.bucketEncryptionConfiguration,
+  configuration.bucketLifecycleConfiguration,
+  configuration.bucketReplicationConfiguration,
+  configuration.bucketAccelerateConfiguration,
+  configuration.bucketWebsiteConfiguration,
+  configuration.bucketNotificationConfiguration,
+  configuration.bucketTaggingConfiguration,
+  configuration.bucketObjectLockConfiguration,
+  configuration.bucketCorsConfiguration,
+  configuration.bucketRequestPaymentConfiguration,
+  configurationItemCaptureTime,
+  configurationItemStatus
+WHERE
+  resourceType = 'AWS::S3::Bucket'
+  AND configurationItemStatus IN ('OK', 'ResourceDiscovered')
+ORDER BY
+  configurationItemCaptureTime DESC
