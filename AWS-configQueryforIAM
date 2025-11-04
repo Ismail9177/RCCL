@@ -1,0 +1,23 @@
+SELECT
+  resourceId,
+  resourceName,
+  resourceType,
+  awsRegion,
+  configuration.path,
+  configuration.userName,
+  configuration.userId,
+  configuration.arn,
+  configuration.createDate,
+  configuration.passwordLastUsed,
+  configuration.userPolicyList,
+  configuration.groupList,
+  configuration.attachedManagedPolicies,
+  configuration.permissionsBoundary,
+  configuration.tags,
+  configurationItemCaptureTime,
+  configurationItemStatus
+WHERE
+  resourceType = 'AWS::IAM::User'
+  AND configurationItemStatus IN ('OK', 'ResourceDiscovered')
+ORDER BY
+  configurationItemCaptureTime DESC
