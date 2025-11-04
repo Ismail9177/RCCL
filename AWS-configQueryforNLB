@@ -1,0 +1,27 @@
+SELECT
+  resourceId,
+  resourceName,
+  resourceType,
+  awsRegion,
+  availabilityZone,
+  configuration.loadBalancerName,
+  configuration.loadBalancerArn,
+  configuration.dNSName,
+  configuration.canonicalHostedZoneId,
+  configuration.scheme,
+  configuration.vpcId,
+  configuration.availabilityZones,
+  configuration.securityGroups,
+  configuration.ipAddressType,
+  configuration.type,
+  configuration.state,
+  configuration.createdTime,
+  configuration.tags,
+  configurationItemCaptureTime,
+  configurationItemStatus
+WHERE
+  resourceType = 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+  AND configuration.type = 'network'
+  AND configurationItemStatus IN ('OK', 'ResourceDiscovered')
+ORDER BY
+  configurationItemCaptureTime DESC
