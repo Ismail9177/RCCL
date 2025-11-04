@@ -1,0 +1,23 @@
+SELECT
+  resourceId,
+  resourceName,
+  resourceType,
+  awsRegion,
+  availabilityZone,
+  configuration.vpcId,
+  configuration.state,
+  configuration.cidrBlock,
+  configuration.cidrBlockAssociationSet,
+  configuration.ipv6CidrBlockAssociationSet,
+  configuration.dhcpOptionsId,
+  configuration.instanceTenancy,
+  configuration.isDefault,
+  configuration.ownerId,
+  configuration.tags,
+  configurationItemCaptureTime,
+  configurationItemStatus
+WHERE
+  resourceType = 'AWS::EC2::VPC'
+  AND configurationItemStatus IN ('OK', 'ResourceDiscovered')
+ORDER BY
+  configurationItemCaptureTime DESC
