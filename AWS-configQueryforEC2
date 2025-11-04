@@ -1,0 +1,43 @@
+SELECT
+  resourceId,
+  resourceName,
+  resourceType,
+  awsRegion,
+  availabilityZone,
+  configuration.instanceId,
+  configuration.imageId,
+  configuration.instanceType,
+  configuration.keyName,
+  configuration.launchTime,
+  configuration.placement,
+  configuration.platform,
+  configuration.privateDnsName,
+  configuration.privateIpAddress,
+  configuration.publicDnsName,
+  configuration.publicIpAddress,
+  configuration.state,
+  configuration.stateTransitionReason,
+  configuration.subnetId,
+  configuration.vpcId,
+  configuration.architecture,
+  configuration.blockDeviceMappings,
+  configuration.ebsOptimized,
+  configuration.enaSupport,
+  configuration.hypervisor,
+  configuration.iamInstanceProfile,
+  configuration.instanceLifecycle,
+  configuration.monitoring,
+  configuration.networkInterfaces,
+  configuration.rootDeviceName,
+  configuration.rootDeviceType,
+  configuration.securityGroups,
+  configuration.spotInstanceRequestId,
+  configuration.tags,
+  configuration.virtualizationType,
+  configurationItemCaptureTime,
+  configurationItemStatus
+WHERE
+  resourceType = 'AWS::EC2::Instance'
+  AND configurationItemStatus IN ('OK', 'ResourceDiscovered')
+ORDER BY
+  configurationItemCaptureTime DESC
