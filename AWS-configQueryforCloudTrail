@@ -1,0 +1,31 @@
+SELECT
+  resourceId,
+  resourceName,
+  resourceType,
+  awsRegion,
+  configuration.name,
+  configuration.trailARN,
+  configuration.s3BucketName,
+  configuration.s3KeyPrefix,
+  configuration.snsTopicName,
+  configuration.snsTopicARN,
+  configuration.includeGlobalServiceEvents,
+  configuration.isMultiRegionTrail,
+  configuration.homeRegion,
+  configuration.logFileValidationEnabled,
+  configuration.cloudWatchLogsLogGroupArn,
+  configuration.cloudWatchLogsRoleArn,
+  configuration.kmsKeyId,
+  configuration.hasCustomEventSelectors,
+  configuration.hasInsightSelectors,
+  configuration.isOrganizationTrail,
+  configuration.eventSelectors,
+  configuration.advancedEventSelectors,
+  configuration.insightSelectors,
+  configurationItemCaptureTime,
+  configurationItemStatus
+WHERE
+  resourceType = 'AWS::CloudTrail::Trail'
+  AND configurationItemStatus IN ('OK', 'ResourceDiscovered')
+ORDER BY
+  configurationItemCaptureTime DESC
