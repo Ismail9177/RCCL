@@ -1,0 +1,26 @@
+SELECT
+  resourceId,
+  resourceName,
+  resourceType,
+  awsRegion,
+  availabilityZone,
+  configuration.volumeId,
+  configuration.volumeType,
+  configuration.size,
+  configuration.state,
+  configuration.createTime,
+  configuration.snapshotId,
+  configuration.encrypted,
+  configuration.kmsKeyId,
+  configuration.iops,
+  configuration.throughput,
+  configuration.multiAttachEnabled,
+  configuration.attachments,
+  configuration.tags,
+  configurationItemCaptureTime,
+  configurationItemStatus
+WHERE
+  resourceType = 'AWS::EC2::Volume'
+  AND configurationItemStatus IN ('OK', 'ResourceDiscovered')
+ORDER BY
+  configurationItemCaptureTime DESC
