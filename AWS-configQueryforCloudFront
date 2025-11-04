@@ -1,0 +1,33 @@
+SELECT
+  resourceId,
+  resourceName,
+  resourceType,
+  awsRegion,
+  configuration.id,
+  configuration.arn,
+  configuration.status,
+  configuration.lastModifiedTime,
+  configuration.domainName,
+  configuration.aliases,
+  configuration.origins,
+  configuration.originGroups,
+  configuration.defaultCacheBehavior,
+  configuration.cacheBehaviors,
+  configuration.customErrorResponses,
+  configuration.comment,
+  configuration.priceClass,
+  configuration.enabled,
+  configuration.viewerCertificate,
+  configuration.restrictions,
+  configuration.webACLId,
+  configuration.httpVersion,
+  configuration.isIPV6Enabled,
+  configuration.logging,
+  configuration.defaultRootObject,
+  configurationItemCaptureTime,
+  configurationItemStatus
+WHERE
+  resourceType = 'AWS::CloudFront::Distribution'
+  AND configurationItemStatus IN ('OK', 'ResourceDiscovered')
+ORDER BY
+  configurationItemCaptureTime DESC
