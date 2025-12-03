@@ -1,0 +1,10 @@
+resources
+| where type =~ 'microsoft.network/applicationgateways'
+| project
+    Name = name,
+    Location = location,
+    Listeners = tostring(properties.httpListeners),
+    BackendSettings = tostring(properties.backendHttpSettingsCollection),
+    BackendPools = tostring(properties.backendAddressPools),
+    RequestRoutingRules = tostring(properties.requestRoutingRules),
+    HealthProbes = tostring(properties.probes)
