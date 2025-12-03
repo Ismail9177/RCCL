@@ -1,0 +1,8 @@
+authorizationresources
+| where type == "microsoft.authorization/roleassignments"
+| where properties.scope contains "Microsoft.ContainerRegistry/registries"
+| extend principalType = tostring(properties.principalType)
+| where principalType == "ServicePrincipal"
+| extend roleDefinitionId = tostring(properties.roleDefinitionId)
+| extend principalId = tostring(properties.principalId)
+| project subscriptionId, resourceGroup, principalId, principalType, roleDefinitionId, properties.scope
