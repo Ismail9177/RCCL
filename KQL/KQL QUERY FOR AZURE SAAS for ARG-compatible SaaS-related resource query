@@ -1,0 +1,8 @@
+resources
+| where type contains "App" or type contains "saas" or type contains "marketplace"
+| project subscriptionId,
+          resourceGroup,
+          resourceName = name,
+          resourceType = type,
+          location
+| order by subscriptionId asc, resourceGroup asc, resourceName asc
