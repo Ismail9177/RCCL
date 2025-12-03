@@ -1,0 +1,7 @@
+resources
+| where type =~ 'microsoft.network/applicationgateways'
+| project
+    applicationGatewayName = name,
+    resourceGroupName = resourceGroup,
+    subscriptionId,
+    apiVersion = apiVersion
