@@ -1,0 +1,27 @@
+resources
+| where type =~ "microsoft.network/azurefirewalls"
+| extend 
+    firewallPolicyId = tostring(properties.firewallPolicy.id),
+    skuName = tostring(properties.sku.name),
+    subnetId = tostring(properties.ipConfigurations[0].properties.subnet.id)
+| project firewallName = name, resourceGroup, location, firewallPolicyId, skuName, subnetId
+| join kind=leftouter (
+    resources
+    | where type =~ "microsoft.network/virtualnetworks"
+    | mv-expand subnets = properties.subnets
+    | extend subnetId = strcat(id, "/subnets/", tostring(subnets.name))
+    | project subnetId, subnetName = tostring(subnets.name), vnetName = name, routeTableId = tostring(subnets.properties.routeTable.id)
+) on subnetId
+| extend 
+    firewallPolicyName = iff(isnotempty(firewallPolicyId), tostring(split(firewallPolicyId, "/")[-1]), "None"),
+    routeTableName = iff(isnotempty(routeTableId), tostring(split(routeTableId, "/")[-1]), "None")
+| project
+    FirewallName = firewallName,
+    ResourceGroup = resourceGroup,
+    Location = location,
+    VirtualNetwork = vnetName,
+    SubnetName = subnetName,
+    FirewallPolicy = firewallPolicyName,
+    FirewallSKU = skuName,
+    RouteTable = routeTableName
+| order by FirewallName asc
