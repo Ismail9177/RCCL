@@ -1,0 +1,7 @@
+resources
+| where type == "microsoft.eventgrid/topics"
+| project topicName = name,
+          resourceGroup,
+          location,
+          kind,
+          inputSchema = properties.inputSchema
