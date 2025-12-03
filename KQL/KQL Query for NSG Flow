@@ -1,0 +1,8 @@
+resources
+| where type == "microsoft.network/networksecuritygroups"
+| project
+    subscriptionId,
+    resourceGroup,
+    name,
+    location,
+    securityRules = properties.securityRules
