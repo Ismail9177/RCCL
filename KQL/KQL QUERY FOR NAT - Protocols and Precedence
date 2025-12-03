@@ -1,0 +1,13 @@
+resources
+| where type =~ "microsoft.network/networksecuritygroups"
+| mv-expand rules = properties.securityRules
+| extend 
+    ruleName = tostring(rules.name),
+    protocol = tostring(rules.properties.protocol),
+    priority = toint(rules.properties.priority)
+| project 
+    NSGName = name,
+    ruleName,
+    protocol,
+    priority
+| order by NSGName asc, priority asc
