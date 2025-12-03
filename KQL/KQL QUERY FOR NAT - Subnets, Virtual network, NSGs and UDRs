@@ -1,0 +1,16 @@
+resources
+| where type =~ "microsoft.network/virtualnetworks"
+| project vnetName = name, resourceGroup, location, subnets = properties.subnets
+| mv-expand subnet = subnets
+| extend 
+    subnetName = tostring(subnet.name),
+    nsgId = tostring(subnet.properties.networkSecurityGroup.id),
+    routeTableId = tostring(subnet.properties.routeTable.id)
+| project 
+    vnetName,
+    subnetName,
+    resourceGroup,
+    location,
+    NetworkSecurityGroup = iff(isnotempty(nsgId), tostring(split(nsgId, "/")[-1]), "None"),
+    UserDefinedRoute = iff(isnotempty(routeTableId), tostring(split(routeTableId, "/")[-1]), "None")
+| order by vnetName asc, subnetName asc
