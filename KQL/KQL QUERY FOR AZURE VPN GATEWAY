@@ -1,0 +1,17 @@
+resources
+| where type =~ 'microsoft.network/virtualnetworkgateways'
+| project
+    Name = name,
+    Region = location,
+    GatewayType = tostring(properties.gatewayType),
+    VpnType = tostring(properties.vpnType),
+    Sku = tostring(properties.sku.name),
+    Generation = tostring(properties.vpnGatewayGeneration),
+    VirtualNetwork = tostring(properties.ipConfigurations[0].properties.subnet.id),
+    GatewaySubnetAddressRange = tostring(properties.ipConfigurations[0].properties.subnet.id),
+    PublicIPAddress = tostring(properties.ipConfigurations[0].properties.publicIPAddress.id),
+    PublicIPSKUSKU = tostring(properties.ipConfigurations[0].properties.publicIPAddress.properties.sku.name),
+    Assignment = tostring(properties.ipConfigurations[0].properties.privateIPAllocationMethod),
+    ActiveActiveMode = tostring(properties.activeActive),
+    EnableBGP = tostring(properties.enableBgp)
+| order by ['Region'] asc
