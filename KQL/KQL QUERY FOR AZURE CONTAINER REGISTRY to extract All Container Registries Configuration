@@ -1,0 +1,7 @@
+resources
+| where type == "microsoft.containerregistry/registries"
+| extend adminUserEnabled = tostring(properties.adminUserEnabled)
+| extend publicNetworkAccess = tostring(properties.publicNetworkAccess)
+| extend identityType = tostring(identity.type)
+| extend skuName = tostring(sku.name)
+| project subscriptionId, resourceGroup, name, location, skuName, adminUserEnabled, publicNetworkAccess, identityType, id
