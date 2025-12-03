@@ -1,0 +1,6 @@
+resources
+| where type == "microsoft.containerregistry/registries"
+| where identity.type =~ "SystemAssigned" or identity.type =~ "SystemAssigned, UserAssigned"
+| extend identityType = tostring(identity.type)
+| extend principalId = tostring(identity.principalId)
+| project subscriptionId, resourceGroup, name, identityType, principalId, id
