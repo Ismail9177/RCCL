@@ -1,0 +1,13 @@
+resources
+| where type == "microsoft.containerregistry/registries"
+| project acrId = tolower(id), acrName = name, acrResourceGroup = resourceGroup, acrSubscriptionId = subscriptionId, acrLocation = location
+| join kind=leftouter (
+    authorizationresources
+    | where type == "microsoft.authorization/roleassignments"
+    | extend scope = tolower(tostring(properties.scope))
+    | extend principalType = tostring(properties.principalType)
+    | extend principalId = tostring(properties.principalId)
+    | extend roleDefinitionId = tostring(properties.roleDefinitionId)
+    | project scope, principalType, principalId, roleDefinitionId
+) on $left.acrId == $right.scope
+| project acrName, acrResourceGroup, acrSubscriptionId, principalType, principalId, roleDefinitionId
