@@ -1,0 +1,7 @@
+resources
+| where type == "microsoft.eventgrid/eventsubscriptions"
+| project subscriptionName = name,
+          resourceGroup,
+          topicId = properties.topic,
+          destinationType = properties.destination.endpointType,
+          eventDeliverySchema = properties.eventDeliverySchema
