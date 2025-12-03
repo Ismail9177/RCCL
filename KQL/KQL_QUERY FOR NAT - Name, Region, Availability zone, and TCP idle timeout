@@ -1,0 +1,7 @@
+resources
+| where type =~ "microsoft.network/natgateways"
+| project
+    Name = name,
+    Region = location,
+    AvailabilityZones = tostring(properties.zones),          
+    TcpIdleTimeoutInMinutes = tostring(properties.idleTimeoutInMinutes)
