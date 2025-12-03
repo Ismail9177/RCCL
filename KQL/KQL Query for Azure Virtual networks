@@ -1,0 +1,11 @@
+resources
+| where type == "microsoft.network/routetables"
+| mv-expand route = properties.routes
+| project
+    subscriptionId,
+    resourceGroup,
+    routeTableName = name,
+    routeName = tostring(route.name),
+    addressPrefix = tostring(route.properties.addressPrefix),
+    nextHopType = tostring(route.properties.nextHopType),
+    nextHopIpAddress = tostring(route.properties.nextHopIpAddress)
