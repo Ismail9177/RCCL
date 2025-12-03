@@ -1,0 +1,5 @@
+Resources
+| where type == "microsoft.containerregistry/registries"
+| extend pe = properties.privateEndpointConnections
+| mv-expand pe
+| project name, resourceGroup, privateEndpointName = pe.name, connectionState = pe.properties.privateLinkServiceConnectionState.status
