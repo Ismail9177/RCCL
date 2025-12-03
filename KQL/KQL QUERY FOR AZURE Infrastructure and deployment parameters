@@ -1,0 +1,7 @@
+resources
+| where type =~ 'microsoft.network/applicationgateways'
+| project
+    Name = name,
+    Location = location,
+    RewriteRules = tostring(properties.rewriteRuleSets),
+    WAFConfiguration = tostring(properties.webApplicationFirewallConfiguration)
