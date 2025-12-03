@@ -1,0 +1,8 @@
+resources
+| where type =~ "microsoft.network/natgateways"
+| project
+    Name = name,
+    PublicIPAddresses = tostring(properties.publicIpAddresses),
+    PublicIPPrefixes = tostring(properties.publicIpPrefixes),
+    TotalAddresses = 
+        array_length(todynamic(properties.publicIpAddresses)) + array_length(todynamic(properties.publicIpPrefixes))
