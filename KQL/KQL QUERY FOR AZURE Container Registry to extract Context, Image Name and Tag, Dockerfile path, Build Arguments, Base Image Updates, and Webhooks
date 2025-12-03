@@ -1,0 +1,15 @@
+resources
+| where type =~ 'microsoft.containerregistry/registries/tasks'
+| extend taskProps = properties
+| project
+    ResourceGroup = resourceGroup,
+    RegistryName = tostring(split(id, '/')[8]),
+    TaskName = name,
+    Location = location,
+    Context = tostring(taskProps.step.contextPath),
+    ImageNameAndTag = tostring(taskProps.step.imageNames),
+    DockerfilePath = tostring(taskProps.step.dockerFilePath),
+    BuildArguments = tostring(taskProps.step.arguments),
+    BaseImageTriggerName = tostring(taskProps.baseImageTrigger.name),
+    BaseImageTriggerType = tostring(taskProps.baseImageTrigger.triggerType),
+    WebhookStatus = tostring(properties.status)
