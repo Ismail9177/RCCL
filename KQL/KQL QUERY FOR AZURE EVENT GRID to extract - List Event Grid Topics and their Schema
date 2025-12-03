@@ -1,0 +1,9 @@
+resources
+| where type == "microsoft.eventgrid/topics"
+| project name,
+          resourceGroup,
+          location,
+          kind,
+          inputSchema = properties.inputSchema,
+          inboundIpRules = properties.inboundIpRules,
+          provisioningState = properties.provisioningState
