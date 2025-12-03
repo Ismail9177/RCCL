@@ -1,0 +1,9 @@
+resources
+| where type =~ 'microsoft.network/applicationgateways'
+| extend backendPools = parse_json(properties.backendAddressPools)
+| mv-expand backendPools
+| project
+    applicationGatewayName = name,
+    resourceGroupName = resourceGroup,
+    BackendPoolName = tostring(backendPools.name),
+    BackendAddresses = tostring(backendPools.properties.backendAddresses)
