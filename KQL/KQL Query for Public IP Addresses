@@ -1,0 +1,8 @@
+resources
+| where type == "microsoft.network/publicipaddresses"
+| project
+    subscriptionId,
+    resourceGroup,
+    name,
+    location,
+    ipAddress = properties.ipAddress
