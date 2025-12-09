@@ -1,0 +1,16 @@
+SELECT 
+    product_instance_type,
+    COUNT(DISTINCT line_item_resource_id) as instance_count,
+    SUM(line_item_usage_amount) as total_hours,
+    SUM(line_item_unblended_cost) as total_cost
+FROM 
+    your_cur_database.your_cur_table
+WHERE 
+    line_item_product_code = 'AmazonEC2'
+    AND product_instance_type != ''
+    AND year = '2024'
+    AND month = '12'
+GROUP BY 
+    product_instance_type
+ORDER BY 
+    total_cost DESC;
